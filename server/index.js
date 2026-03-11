@@ -7,9 +7,14 @@ const cookiesParser = require('cookie-parser')
 const { app, server } = require('./socket/index')
 
 // const app = express()
+const cors = require("cors")
+
 app.use(cors({
-    origin : process.env.FRONTEND_URL,
-    credentials : true
+  origin: [
+    "http://localhost:3000",
+    "https://chat-app-mu-ruby-89.vercel.app"
+  ],
+  credentials: true
 }))
 app.use(express.json())
 app.use(cookiesParser())
