@@ -38,32 +38,25 @@ const Home = () => {
     fetchUserDetails()
   },[])
 
- /***socket connection */
-useEffect(()=>{
+  /***socket connection */
+  useEffect(()=>{
+    const socketConnection = io(process.env.REACT_APP_BACKEND_URL,{
+      auth : {
+        token : localStorage.getItem('token')
+      },
+    })
 
-  const socketConnection = io(process.env.REACT_APP_BACKEND_URL,{
-    auth : {
-      token : localStorage.getItem('token')
-    },
-    transports: ["websocket"],
-    withCredentials: true
-  })
+    socketConnection.on('onlineUser',(data)=>{
+      console.log(data)
+      dispatch(setOnlineUser(data))
+    })
 
-  socketConnection.on("connect",()=>{
-    console.log("socket connected",socketConnection.id)
-  })
+    dispatch(setSocketConnection(socketConnection))
 
-  socketConnection.on("onlineUser",(data)=>{
-    dispatch(setOnlineUser(data))
-  })
-
-  dispatch(setSocketConnection(socketConnection))
-
-  return ()=>{
-    socketConnection.disconnect()
-  }
-
-},[])
+    return ()=>{
+      socketConnection.disconnect()
+    }
+  },[])
 
 
   const basePath = location.pathname === '/'

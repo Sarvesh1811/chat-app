@@ -6,29 +6,27 @@ const router = require('./routes/index')
 const cookiesParser = require('cookie-parser')
 const { app, server } = require('./socket/index')
 
+// const app = express()
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://chat-app-mu-ruby-89.vercel.app"
-  ],
-  credentials: true
+    origin : process.env.FRONTEND_URL,
+    credentials : true
 }))
-
 app.use(express.json())
 app.use(cookiesParser())
 
 const PORT = process.env.PORT || 8080
 
-app.get('/',(req,res)=>{
-  res.json({
-    message: "Server running at " + PORT
-  })
+app.get('/',(request,response)=>{
+    response.json({
+        message : "Server running at " + PORT
+    })
 })
 
-app.use('/api', router)
+//api endpoints
+app.use('/api',router)
 
 connectDB().then(()=>{
-  server.listen(PORT,()=>{
-    console.log("server running at " + PORT)
-  })
+    server.listen(PORT,()=>{
+        console.log("server running at " + PORT)
+    })
 })
