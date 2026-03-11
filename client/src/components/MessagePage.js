@@ -93,24 +93,30 @@ const MessagePage = () => {
     })
   }
 
-  useEffect(()=>{
-      if(socketConnection){
-        socketConnection.emit('message-page',params.userId)
+ useEffect(() => {
 
-        socketConnection.emit('seen',params.userId)
+  if(!socketConnection) return
 
-        socketConnection.on('message-user',(data)=>{
-          setDataUser(data)
-        }) 
-        
-        socketConnection.on('message',(data)=>{
-          console.log('message data',data)
-          setAllMessage(data)
-        })
+  socketConnection.emit('message-page', params.userId)
+  socketConnection.emit('seen', params.userId)
 
+  const handleUser = (data) => {
+    setDataUser(data)
+  }
 
-      }
-  },[socketConnection,params?.userId,user])
+  const handleMessage = (data) => {
+    setAllMessage(data)
+  }
+
+  socketConnection.on('message-user', handleUser)
+  socketConnection.on('message', handleMessage)
+
+  return () => {
+    socketConnection.off('message-user', handleUser)
+    socketConnection.off('message', handleMessage)
+  }
+
+}, [socketConnection, params.userId])
 
   const handleOnChange = (e)=>{
     const { name, value} = e.target
