@@ -5,8 +5,8 @@ const connectDB = require('./config/connectDB')
 const router = require('./routes/index')
 const cookiesParser = require('cookie-parser')
 const { app, server } = require('./socket/index')
+const https = require('https')
 
-// const app = express()
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -19,17 +19,27 @@ app.use(cookiesParser())
 
 const PORT = process.env.PORT || 8080
 
-app.get('/',(request,response)=>{
+app.get('/', (request, response) => {
     response.json({
-        message : "Server running at " + PORT
+        message: "Server running at " + PORT
     })
 })
 
-//api endpoints
-app.use('/api',router)
+// API endpoints
+app.use('/api', router)
 
-connectDB().then(()=>{
-    server.listen(PORT,()=>{
+// Keep Render free tier alive (pings every 14 min so it never sleeps)
+const keepAlive = () => {
+    https.get('https://chat-app-backend-km3a.onrender.com', (res) => {
+        console.log(`✅ Keep-alive ping. Status: ${res.statusCode}`)
+    }).on('error', (err) => {
+        console.log('Keep-alive ping failed:', err.message)
+    })
+}
+setInterval(keepAlive, 14 * 60 * 1000)
+
+connectDB().then(() => {
+    server.listen(PORT, () => {
         console.log("server running at " + PORT)
     })
 })
